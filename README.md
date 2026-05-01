@@ -36,7 +36,7 @@ https://github.com/yourname/insight-link-pro/assets/demo_clip.mp4
 
 ### Live Documentation + Diagram Generation
 
-![Insight-Link Pro fetching FastAPI BackgroundTasks source and rendering a flow diagram](assets/demo_background_tasks.png)
+![Insight-Link Pro fetching FastAPI BackgroundTasks source and rendering a flow diagram](assets/demo_analysing.png)
 
 *Fetching the real `BackgroundTasks` implementation from the `tiangolo/fastapi` repo and Starlette source, then synthesising a grounded lifecycle diagram — no guessing, every node backed by actual source.*
 
@@ -160,7 +160,7 @@ insight_link_pro/
 ├── assets/
 │   ├── demo_clip.mp4
 │   ├── demo_map_repository.png
-│   └── demo_background_tasks.png
+│   └── demo_analysing.png
 ├── .env.example
 └── requirements.txt
 ```
