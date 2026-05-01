@@ -66,7 +66,6 @@ def register_doc_tools(mcp: FastMCP) -> None:
             logger.exception("web_to_markdown unexpected error")
             return build_error_response("web_to_markdown", exc)
 
-    # ------------------------------------------------------------------ #
 
     @mcp.tool()
     async def search_stack_overflow(query: str, num_results: int = 5) -> str:
@@ -109,9 +108,7 @@ def register_doc_tools(mcp: FastMCP) -> None:
             return build_error_response("search_stack_overflow", exc)
 
 
-# ------------------------------------------------------------------ #
 # Private helpers
-# ------------------------------------------------------------------ #
 
 @async_retry(max_attempts=3, backoff=2.0, exceptions=(httpx.RequestError,))
 async def _fetch_via_jina(ctx: ContextManager, url: str) -> str:

@@ -78,7 +78,6 @@ def register_analysis_tools(mcp: FastMCP) -> None:
             logger.exception("analyze_issues unexpected error")
             return build_error_response("analyze_issues", exc)
 
-    # ------------------------------------------------------------------ #
 
     @mcp.tool()
     async def dependency_checker(manifest_path: str) -> str:
@@ -125,9 +124,7 @@ def register_analysis_tools(mcp: FastMCP) -> None:
             return build_error_response("dependency_checker", exc)
 
 
-# ------------------------------------------------------------------ #
 # Issue analysis helpers
-# ------------------------------------------------------------------ #
 
 _CATEGORY_KEYWORDS: dict[str, list[str]] = {
     "bug": ["bug", "error", "crash", "fix", "broken", "fail", "regression", "exception"],
@@ -218,9 +215,7 @@ async def _fetch_and_categorise_issues(
     return "\n".join(lines)
 
 
-# ------------------------------------------------------------------ #
 # Dependency checker helpers
-# ------------------------------------------------------------------ #
 
 def _parse_requirements_txt(content: str) -> list[tuple[str, str]]:
     """Parse requirements.txt into (package, pinned_version) pairs.

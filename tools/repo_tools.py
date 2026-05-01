@@ -82,7 +82,6 @@ def register_repo_tools(mcp: FastMCP) -> None:
             logger.exception("map_repository unexpected error")
             return build_error_response("map_repository", exc)
 
-    # ------------------------------------------------------------------ #
 
     @mcp.tool()
     async def inspect_code(
@@ -153,9 +152,7 @@ def register_repo_tools(mcp: FastMCP) -> None:
             return build_error_response("inspect_code", exc)
 
 
-# ------------------------------------------------------------------ #
 # Helpers
-# ------------------------------------------------------------------ #
 
 def _walk_tree(
     current: Path,

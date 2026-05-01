@@ -92,9 +92,7 @@ class ContextManager:
             raise RuntimeError("ContextManager not entered — use 'async with ContextManager()'.")
         return self._client
 
-    # ------------------------------------------------------------------ #
     # Budget helpers
-    # ------------------------------------------------------------------ #
 
     @staticmethod
     def truncate(text: str, label: str = "response") -> str:
