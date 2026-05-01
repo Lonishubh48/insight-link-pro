@@ -18,7 +18,15 @@ Insight-Link Pro solves this with a **3-stage execution pipeline**:
 
 ---
 
-## Demo
+## 🎬 Demo Video
+
+https://github.com/yourname/insight-link-pro/assets/demo_clip.mp4
+
+*Full walkthrough using the `huggingface/transformers` repository — covering all 6 tools in a single session.*
+
+---
+
+## Screenshots
 
 ### Repository Mapping
 
@@ -150,6 +158,7 @@ insight_link_pro/
 ├── utils/
 │   └── helpers.py             # Logging, rate limiter, retry decorator, formatters
 ├── assets/
+│   ├── demo_clip.mp4
 │   ├── demo_map_repository.png
 │   └── demo_background_tasks.png
 ├── .env.example
