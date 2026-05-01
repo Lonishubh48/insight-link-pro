@@ -123,18 +123,19 @@ python main.py --transport sse --port 8000
 
 ### 4. Connect to Claude Desktop
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
+Add the following to your configuration file:
+- **macOS/Linux:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 ```json
 {
   "mcpServers": {
     "insight-link-pro": {
-      "command": "python",
-      "args": ["/absolute/path/to/insight_link_pro/main.py"],
+      "command": "/PATH/TO/YOUR/REPO/.venv/bin/python", 
+      "args": ["/PATH/TO/YOUR/REPO/main.py"],
       "env": {
-        "GITHUB_TOKEN": "ghp_...",
-        "JINA_API_KEY": "jina_...",
-        "SE_API_KEY": "..."
+        "GITHUB_TOKEN": "YOUR_TOKEN",
+        "JINA_API_KEY": "YOUR_KEY",
+        "SE_API_KEY": "YOUR_KEY"
       }
     }
   }
