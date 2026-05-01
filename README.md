@@ -208,4 +208,4 @@ ruff check .
 
 ## License
 
-MIT © 2025 Insight-Link Pro
+MIT © 2026 Insight-Link Pro
