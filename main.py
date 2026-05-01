@@ -17,10 +17,6 @@ import sys
 from fastmcp import FastMCP
 
 from core.config import config
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 from tools import register_analysis_tools, register_doc_tools, register_repo_tools
 from utils.helpers import setup_logging
 
@@ -30,6 +26,10 @@ from utils.helpers import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
+
+# Total tools: map_repository, inspect_code, web_to_markdown,
+#              search_stack_overflow, analyze_issues, dependency_checker
+_TOOL_COUNT = 6
 
 
 def create_server() -> FastMCP:
@@ -58,7 +58,11 @@ def create_server() -> FastMCP:
     register_doc_tools(mcp)
     register_analysis_tools(mcp)
 
-    logger.info("✅ Insight-Link Pro server '%s' initialised with 6 tools.", config.server_name)
+    logger.info(
+        " Insight-Link Pro server '%s' initialised with %d tools.",
+        config.server_name,
+        _TOOL_COUNT,
+    )
 
     # Surface credential warnings at startup
     for warning in config.validate():

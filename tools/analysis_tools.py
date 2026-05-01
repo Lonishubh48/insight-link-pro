@@ -12,6 +12,7 @@ Tools:
 import json
 import logging
 import re
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 import httpx
@@ -49,7 +50,7 @@ def register_analysis_tools(mcp: FastMCP) -> None:
         """
         repo = github_repo.strip().strip("/")
         if not re.match(r"^[\w.\-]+/[\w.\-]+$", repo):
-            return "❌ Invalid repo format. Use `owner/repo` (e.g. `fastapi/fastapi`)."
+            return " Invalid repo format. Use `owner/repo` (e.g. `fastapi/fastapi`)."
 
         max_issues = max(1, min(max_issues, 100))
         cache_key = f"issues:{repo}:{max_issues}"
@@ -69,9 +70,9 @@ def register_analysis_tools(mcp: FastMCP) -> None:
 
         except httpx.HTTPStatusError as exc:
             if exc.response.status_code == 404:
-                return f"❌ Repository `{repo}` not found or is private."
+                return f" Repository `{repo}` not found or is private."
             if exc.response.status_code == 403:
-                return "❌ GitHub rate limit hit. Set GITHUB_TOKEN in .env to increase quota."
+                return f" GitHub rate limit hit. Set GITHUB_TOKEN in .env to increase quota."
             return build_error_response("analyze_issues", exc)
         except Exception as exc:
             logger.exception("analyze_issues unexpected error")
@@ -96,7 +97,7 @@ def register_analysis_tools(mcp: FastMCP) -> None:
         """
         path = Path(manifest_path).expanduser().resolve()
         if not path.exists():
-            return f"❌ File not found: `{path}`"
+            return f" File not found: `{path}`"
 
         cache_key = f"deps:{path}"
         cached = await cache.get(cache_key)
@@ -112,7 +113,7 @@ def register_analysis_tools(mcp: FastMCP) -> None:
                     result = await _check_node_deps(ctx, path)
                 else:
                     return (
-                        f"⚠️  Unsupported manifest: `{path.name}`.\n"
+                        f"  Unsupported manifest: `{path.name}`.\n"
                         "Currently supported: `requirements.txt`, `package.json`."
                     )
 
@@ -173,7 +174,7 @@ async def _fetch_and_categorise_issues(
     issues = response.json()
 
     if not issues:
-        return f"✅ No open issues found in `{repo}`."
+        return f" No open issues found in `{repo}`."
 
     # Categorise
     categories: dict[str, list[dict]] = {
@@ -222,14 +223,23 @@ async def _fetch_and_categorise_issues(
 # ------------------------------------------------------------------ #
 
 def _parse_requirements_txt(content: str) -> list[tuple[str, str]]:
-    """Parse requirements.txt into (package, pinned_version) pairs."""
+    """Parse requirements.txt into (package, pinned_version) pairs.
+
+    Captures the version string for ==, >=, <=, ~=, and != specifiers.
+    The returned version is the raw specifier value (e.g. "0.100.0") so
+    callers can compare it against the latest release from PyPI.  When no
+    specifier is present the version is an empty string (unpinned).
+    """
     packages: list[tuple[str, str]] = []
     for raw_line in content.splitlines():
         line = raw_line.strip()
         if not line or line.startswith(("#", "-", "git+")):
             continue
-        # Handle ==, >=, <=, ~=, !=
-        match = re.match(r"^([A-Za-z0-9_.\-]+)\s*(?:==\s*([^\s,;]+))?", line)
+        # Match package name then an optional version specifier (==, >=, <=, ~=, !=)
+        match = re.match(
+            r"^([A-Za-z0-9_.\-]+)\s*(?:[><=~!]=?\s*([^\s,;]+))?",
+            line,
+        )
         if match:
             name = match.group(1)
             version = match.group(2) or ""
@@ -302,17 +312,18 @@ async def _check_osv_vulnerabilities(
     return []
 
 
-async def _check_python_deps(ctx: ContextManager, path: Path) -> str:
-    """Full Python dependency audit."""
-    content = path.read_text(encoding="utf-8")
-    packages = _parse_requirements_txt(content)
-
-    if not packages:
-        return f"⚠️  No parseable dependencies found in `{path}`."
-
+async def _build_dep_report(
+    ctx: ContextManager,
+    path: Path,
+    packages: list[tuple[str, str]],
+    fetch_latest: Callable[[ContextManager, str], Awaitable[str]],
+    ecosystem: str,
+    registry_label: str,
+) -> str:
+    """Shared table-building logic for Python and Node.js dependency audits."""
     lines = [
-        f"# Python Dependency Report: `{path.name}`\n",
-        f"_Checking {len(packages)} package(s) against PyPI and OSV.dev…_\n",
+        f"# {registry_label} Dependency Report: `{path.name}`\n",
+        f"_Checking {len(packages)} package(s) against {registry_label} and OSV.dev…_\n",
         "\n| Package | Pinned | Latest | Status | Vulnerabilities |",
         "|---------|--------|--------|--------|-----------------|",
     ]
@@ -320,19 +331,19 @@ async def _check_python_deps(ctx: ContextManager, path: Path) -> str:
     outdated_count = vuln_count = ok_count = 0
 
     for pkg, pinned in packages:
-        latest = await _get_pypi_latest(ctx, pkg)
-        vulns = await _check_osv_vulnerabilities(ctx, pkg, pinned, "PyPI")
+        latest = await fetch_latest(ctx, pkg)
+        vulns = await _check_osv_vulnerabilities(ctx, pkg, pinned, ecosystem)
 
         if latest == "unknown":
-            status = "⚠️ Unknown"
+            status = " Unknown"
         elif not pinned:
-            status = "❔ Unpinned"
+            status = " Unpinned"
             ok_count += 1
         elif pinned == latest:
-            status = "✅ Up-to-date"
+            status = " Up-to-date"
             ok_count += 1
         else:
-            status = f"🔄 Outdated → {latest}"
+            status = f" Outdated → {latest}"
             outdated_count += 1
 
         vuln_ids = ", ".join(v.get("id", "?") for v in vulns[:3]) if vulns else "—"
@@ -343,8 +354,23 @@ async def _check_python_deps(ctx: ContextManager, path: Path) -> str:
             f"| `{pkg}` | `{pinned or '(any)'}` | `{latest}` | {status} | {vuln_ids} |"
         )
 
-    lines.append(f"\n**Summary:** ✅ {ok_count} OK · 🔄 {outdated_count} outdated · 🔒 {vuln_count} vulnerable")
+    lines.append(
+        f"\n**Summary:**  {ok_count} OK ·  {outdated_count} outdated ·  {vuln_count} vulnerable"
+    )
     return "\n".join(lines)
+
+
+async def _check_python_deps(ctx: ContextManager, path: Path) -> str:
+    """Full Python dependency audit."""
+    content = path.read_text(encoding="utf-8")
+    packages = _parse_requirements_txt(content)
+
+    if not packages:
+        return f"  No parseable dependencies found in `{path}`."
+
+    return await _build_dep_report(
+        ctx, path, packages, _get_pypi_latest, "PyPI", "Python"
+    )
 
 
 async def _check_node_deps(ctx: ContextManager, path: Path) -> str:
@@ -353,40 +379,8 @@ async def _check_node_deps(ctx: ContextManager, path: Path) -> str:
     packages = _parse_package_json(content)
 
     if not packages:
-        return f"⚠️  No parseable dependencies found in `{path}`."
+        return f" No parseable dependencies found in `{path}`."
 
-    lines = [
-        f"# Node.js Dependency Report: `{path.name}`\n",
-        f"_Checking {len(packages)} package(s) against npm and OSV.dev…_\n",
-        "\n| Package | Pinned | Latest | Status | Vulnerabilities |",
-        "|---------|--------|--------|--------|-----------------|",
-    ]
-
-    outdated_count = vuln_count = ok_count = 0
-
-    for pkg, pinned in packages:
-        latest = await _get_npm_latest(ctx, pkg)
-        vulns = await _check_osv_vulnerabilities(ctx, pkg, pinned, "npm")
-
-        if latest == "unknown":
-            status = "⚠️ Unknown"
-        elif not pinned:
-            status = "❔ Unpinned"
-            ok_count += 1
-        elif pinned == latest:
-            status = "✅ Up-to-date"
-            ok_count += 1
-        else:
-            status = f"🔄 Outdated → {latest}"
-            outdated_count += 1
-
-        vuln_ids = ", ".join(v.get("id", "?") for v in vulns[:3]) if vulns else "—"
-        if vulns:
-            vuln_count += 1
-
-        lines.append(
-            f"| `{pkg}` | `{pinned or '(any)'}` | `{latest}` | {status} | {vuln_ids} |"
-        )
-
-    lines.append(f"\n**Summary:** ✅ {ok_count} OK · 🔄 {outdated_count} outdated · 🔒 {vuln_count} vulnerable")
-    return "\n".join(lines)
+    return await _build_dep_report(
+        ctx, path, packages, _get_npm_latest, "npm", "Node.js"
+    )

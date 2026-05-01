@@ -9,7 +9,6 @@ Tools:
 """
 
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -21,11 +20,13 @@ from utils.helpers import build_error_response, format_file_tree
 
 logger = logging.getLogger(__name__)
 
-# Directories / files to exclude from the tree
+# Directories to exclude from the tree.
+# Note: all dotfiles/dotdirs (e.g. .git, .venv, .mypy_cache) are also skipped
+# via the `name.startswith(".")` check in _walk_tree. If you need to expose
+# specific dotdirs (e.g. .github/workflows), add an explicit allowlist there.
 _IGNORE_DIRS: frozenset[str] = frozenset({
-    "node_modules", ".git", "dist", "build", "__pycache__",
-    ".venv", "venv", ".mypy_cache", ".pytest_cache", "coverage",
-    ".tox", ".eggs", "*.egg-info",
+    "node_modules", "dist", "build", "__pycache__",
+    "venv", "coverage", ".tox", ".eggs", "*.egg-info",
 })
 
 _IGNORE_EXTENSIONS: frozenset[str] = frozenset({
@@ -62,9 +63,9 @@ def register_repo_tools(mcp: FastMCP) -> None:
         try:
             root = Path(root_path).expanduser().resolve()
             if not root.exists():
-                return f"❌ Path not found: `{root}`"
+                return f" Path not found: `{root}`"
             if not root.is_dir():
-                return f"❌ Not a directory: `{root}`"
+                return f" Not a directory: `{root}`"
 
             tree = _walk_tree(root, root, file_count=0)[0]
             rendered = (
@@ -104,13 +105,13 @@ def register_repo_tools(mcp: FastMCP) -> None:
         try:
             path = Path(file_path).expanduser().resolve()
             if not path.exists():
-                return f"❌ File not found: `{path}`"
+                return f" File not found: `{path}`"
             if not path.is_file():
-                return f"❌ Not a regular file: `{path}`"
+                return f" Not a regular file: `{path}`"
 
             # Extension guard
             if path.suffix in _IGNORE_EXTENSIONS:
-                return f"⚠️  Skipping binary/compiled file: `{path.suffix}`"
+                return f"  Skipping binary/compiled file: `{path.suffix}`"
 
             all_lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
             total = len(all_lines)
@@ -124,7 +125,7 @@ def register_repo_tools(mcp: FastMCP) -> None:
             if (end_idx - start_idx) > max_window:
                 end_idx = start_idx + max_window
                 cap_notice = (
-                    f"\n\n⚠️  Output capped at {max_window} lines. "
+                    f"\n\n  Output capped at {max_window} lines. "
                     f"Request a smaller range or increase MAX_FILE_LINES."
                 )
             else:
@@ -146,7 +147,7 @@ def register_repo_tools(mcp: FastMCP) -> None:
             return header + body + cap_notice
 
         except UnicodeDecodeError as exc:
-            return f"❌ Cannot decode file as UTF-8: {exc}"
+            return f"Cannot decode file as UTF-8: {exc}"
         except Exception as exc:
             logger.exception("inspect_code unexpected error")
             return build_error_response("inspect_code", exc)

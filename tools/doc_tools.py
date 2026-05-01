@@ -41,7 +41,7 @@ def register_doc_tools(mcp: FastMCP) -> None:
             Markdown representation of the page content, or an error message.
         """
         if not url.startswith(("http://", "https://")):
-            return "❌ Invalid URL. Must start with `http://` or `https://`."
+            return " Invalid URL. Must start with `http://` or `https://`."
 
         cache_key = f"web:{url}"
         cached = await cache.get(cache_key)
@@ -59,9 +59,9 @@ def register_doc_tools(mcp: FastMCP) -> None:
             return result
 
         except httpx.TimeoutException:
-            return f"❌ Request timed out after {config.request_timeout}s for URL: `{url}`"
+            return f" Request timed out after {config.request_timeout}s for URL: `{url}`"
         except httpx.HTTPStatusError as exc:
-            return f"❌ HTTP {exc.response.status_code} fetching `{url}`: {exc.response.text[:300]}"
+            return f" HTTP {exc.response.status_code} fetching `{url}`: {exc.response.text[:300]}"
         except Exception as exc:
             logger.exception("web_to_markdown unexpected error")
             return build_error_response("web_to_markdown", exc)
@@ -84,7 +84,7 @@ def register_doc_tools(mcp: FastMCP) -> None:
             Formatted Markdown with questions and their best answers.
         """
         if not query.strip():
-            return "❌ Query must not be empty."
+            return " Query must not be empty."
 
         num_results = max(1, min(num_results, 10))
         cache_key = f"so:{query}:{num_results}"
@@ -103,7 +103,7 @@ def register_doc_tools(mcp: FastMCP) -> None:
             return result
 
         except httpx.TimeoutException:
-            return f"❌ Stack Overflow API timed out for query: `{query}`"
+            return f" Stack Overflow API timed out for query: `{query}`"
         except Exception as exc:
             logger.exception("search_stack_overflow unexpected error")
             return build_error_response("search_stack_overflow", exc)
@@ -121,13 +121,12 @@ async def _fetch_via_jina(ctx: ContextManager, url: str) -> str:
     if config.jina_api_key:
         headers["Authorization"] = f"Bearer {config.jina_api_key}"
 
-    resp = ctx.http_client.build_request("GET", jina_url, headers=headers)
-    response = await ctx.http_client.send(resp)
+    response = await ctx.http_client.get(jina_url, headers=headers)
     response.raise_for_status()
 
     markdown = response.text
     if not markdown.strip():
-        return f"⚠️  Jina returned empty content for `{url}`. The page may require JavaScript."
+        return f"  Jina returned empty content for `{url}`. The page may require JavaScript."
 
     truncated = ContextManager.truncate(markdown, label=f"web_to_markdown({url})")
     return f"## Source: [{url}]({url})\n\n{truncated}"
@@ -159,7 +158,7 @@ async def _query_stack_exchange(
 
     items = data.get("items", [])
     if not items:
-        return f"🔍 No Stack Overflow results found for: **{query}**"
+        return f" No Stack Overflow results found for: **{query}**"
 
     sections: list[str] = [
         f"# Stack Overflow: `{query}`\n",
