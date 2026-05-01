@@ -20,6 +20,22 @@ Insight-Link Pro solves this with a **3-stage execution pipeline**:
 
 ## Demo
 
+### Repository Mapping
+
+![Insight-Link Pro mapping a local repository](assets/demo_map_repository.png)
+
+*`map_repository` walks your codebase and returns a clean, annotated file tree — giving the model an accurate picture of your project structure before it reads a single line of code.*
+
+### Live Documentation + Diagram Generation
+
+![Insight-Link Pro fetching FastAPI BackgroundTasks source and rendering a flow diagram](assets/demo_background_tasks.png)
+
+*Fetching the real `BackgroundTasks` implementation from the `tiangolo/fastapi` repo and Starlette source, then synthesising a grounded lifecycle diagram — no guessing, every node backed by actual source.*
+
+---
+
+### End-to-End Example
+
 ```
 User: "Why is my FastAPI app returning 422 errors on /users endpoint?"
 
@@ -133,6 +149,9 @@ insight_link_pro/
 │   └── analysis_tools.py      # analyze_issues, dependency_checker
 ├── utils/
 │   └── helpers.py             # Logging, rate limiter, retry decorator, formatters
+├── assets/
+│   ├── demo_map_repository.png
+│   └── demo_background_tasks.png
 ├── .env.example
 └── requirements.txt
 ```
@@ -160,23 +179,6 @@ insight_link_pro/
 | `REQUEST_TIMEOUT` | `30` | HTTP timeout in seconds |
 | `CACHE_TTL_SECONDS` | `300` | In-memory cache expiry |
 | `LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, `ERROR` |
-
----
-
-## Monetization Angle
-
-| Tier | Features | Price |
-|------|----------|-------|
-| **Free** | `map_repository`, `inspect_code` | $0 |
-| **Pro** | + `web_to_markdown`, `search_stack_overflow` | $9/mo |
-| **Team** | + `analyze_issues`, `dependency_checker`, priority support | $29/mo |
-| **Enterprise** | Private deployment, custom integrations, SSO | Contact |
-
-**Distribution vectors:**
-- **Claude Desktop MCP marketplace** — list as a verified MCP server.
-- **VS Code extension** — wrap the SSE server in a Copilot-compatible extension.
-- **CI/CD bot** — run `dependency_checker` on every PR via GitHub Actions.
-- **API-as-a-service** — expose via Stripe-metered REST endpoint.
 
 ---
 
