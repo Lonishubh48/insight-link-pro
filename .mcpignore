@@ -1,0 +1,11 @@
+Set-Content F:\AgenticAI_MCPservers\insight_link_pro\.mcpignore @"
+# Insight-Link Pro ignore file
+# The MCP server will never scan these paths
+
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials/
+"@

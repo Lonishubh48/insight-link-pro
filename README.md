@@ -191,6 +191,102 @@ insight_link_pro/
 | `LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 
 ---
+## 🔒 Security & Privacy
+
+Insight-Link Pro is designed with a **local-first, minimal-exposure** architecture.
+Here is exactly what stays on your machine and what leaves it.
+
+---
+
+### What Stays 100% Local (Never Leaves Your Machine)
+
+| Operation | Where It Runs |
+|-----------|--------------|
+| `map_repository` — scanning your file tree | Local filesystem only |
+| `inspect_code` — reading file contents | Local filesystem only |
+| All file paths, directory names, source code | Never sent anywhere |
+| Your `.env` file and API keys | Local only, never logged |
+
+> Your source code is **never uploaded, transmitted, or stored** by Insight-Link Pro.
+> The server reads files locally and passes relevant snippets directly to your
+> local Claude Desktop session — no third-party server ever sees your code.
+
+---
+
+### What Goes to External APIs (And Why)
+
+| Tool | External API Called | Data Sent | Why |
+|------|-------------------|-----------|-----|
+| `web_to_markdown` | Jina AI (`r.jina.ai`) | The **URL** you provide | To fetch and convert public documentation pages |
+| `search_stack_overflow` | Stack Exchange API | Your **search query string** | To find relevant Stack Overflow answers |
+| `analyze_issues` | GitHub API (`api.github.com`) | The **repo name** (e.g. `fastapi/fastapi`) | To fetch public issue data |
+| `dependency_checker` | PyPI, npm registry, OSV.dev | **Package names + versions** from your manifest | To check for updates and CVEs |
+
+**Key point:** Only metadata is sent externally — never your source code.
+
+---
+
+### Controlling Access with `.mcpignore`
+
+Just like `.gitignore` tells Git what to skip, `.mcpignore` tells
+Insight-Link Pro what to **never scan or expose**.
+
+Create a `.mcpignore` file in your repository root:
+
+```bash
+# .mcpignore — Insight-Link Pro will never scan these
+
+# Sensitive configuration
+.env
+.env.*
+*.pem
+*.key
+*.p12
+secrets/
+credentials/
+
+# Internal business logic
+internal/
+proprietary/
+billing/
+
+# Large irrelevant directories
+data/
+datasets/
+*.csv
+*.parquet
+```
+
+The server checks `.mcpignore` **before** reading any file or directory.
+Anything listed here is completely invisible to the MCP server.
+
+---
+
+### Zero-Trust Checklist for Enterprise Use
+
+Before deploying in a professional environment, verify:
+
+- [ ] `.mcpignore` created with sensitive paths listed
+- [ ] `GITHUB_TOKEN` uses minimum required scope (`public_repo` only)
+- [ ] Server runs on `stdio` transport (not exposed as a network service)
+- [ ] `.env` file is in `.gitignore` (never committed to version control)
+- [ ] `LOG_LEVEL=INFO` in production (not `DEBUG` — debug logs can be verbose)
+- [ ] Review `MAX_RESPONSE_CHARS` to control how much content enters the LLM context
+
+---
+
+### Reporting a Vulnerability
+
+Found a security issue? Please **do not open a public GitHub issue**.
+
+Instead, email directly: `shubhamloni@gmail.com`
+
+Include:
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+
+You will receive a response within 48 hours.
 
 ## Development
 
