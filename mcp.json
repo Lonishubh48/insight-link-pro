@@ -1,0 +1,41 @@
+{
+  "name": "insight-link-pro",
+  "version": "0.2.0",
+  "description": "An MCP server that eliminates LLM hallucinations by grounding answers in live repository context and real-time documentation.",
+  "author": "Shubham Loni",
+  "homepage": "https://github.com/Lonishubh48/insight-link-pro",
+  "tools": [
+    {
+      "name": "map_repository",
+      "description": "Walk a local repository and return a filtered ASCII file tree. Respects .mcpignore for custom exclusions."
+    },
+    {
+      "name": "inspect_code",
+      "description": "Read a specific line range from a source file with syntax highlighting."
+    },
+    {
+      "name": "web_to_markdown",
+      "description": "Fetch any URL and convert it to clean Markdown using Jina AI."
+    },
+    {
+      "name": "search_stack_overflow",
+      "description": "Search Stack Overflow and return summarized top answers for a query."
+    },
+    {
+      "name": "analyze_issues",
+      "description": "Fetch and categorise open GitHub issues into bugs, features, good first issues, security, and docs."
+    },
+    {
+      "name": "dependency_checker",
+      "description": "Check requirements.txt or package.json for outdated and CVE-vulnerable packages."
+    },
+    {
+      "name": "get_session_context",
+      "description": "Retrieve full session memory including scanned repos, inspected files, fetched URLs, and action timeline."
+    },
+    {
+      "name": "clear_session",
+      "description": "Reset session memory without restarting the server."
+    }
+  ]
+}

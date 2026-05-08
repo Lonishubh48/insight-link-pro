@@ -74,12 +74,14 @@ Answer: "Line 34 in users.py — your UserCreate model requires `email` as a
 
 | Tool | Description |
 |------|-------------|
-| `map_repository` | Filtered file tree (ignores noise dirs) |
+| `map_repository` | Filtered file tree with .mcpignore support |
 | `inspect_code` | Line-range reading with syntax highlighting |
 | `web_to_markdown` | Clean Markdown from any URL via Jina AI |
 | `search_stack_overflow` | Top SO answers summarised per query |
 | `analyze_issues` | GitHub issues categorised by type |
 | `dependency_checker` | Outdated + CVE-vulnerable packages via PyPI/npm/OSV |
+| `get_session_context` | Recall everything done in the current session |
+| `clear_session` | Reset session memory without restarting the server |
 
 ---
 
@@ -182,10 +184,12 @@ insight_link_pro/
 ├── core/
 │   ├── config.py              # Typed settings from .env
 │   └── context_manager.py     # TTL cache + shared HTTP client + budget control
+│   └── session_store.py       # Session memory layer
 ├── tools/
 │   ├── repo_tools.py          # map_repository, inspect_code
 │   ├── doc_tools.py           # web_to_markdown, search_stack_overflow
 │   └── analysis_tools.py      # analyze_issues, dependency_checker
+│   └── session_tools.py       # get_session_context, clear_session
 ├── utils/
 │   └── helpers.py             # Logging, rate limiter, retry decorator, formatters
 ├── assets/
