@@ -17,6 +17,7 @@ import httpx
 
 from core.config import config
 from core.context_manager import ContextManager, cache
+from core.session_store import session_store
 from fastmcp import FastMCP
 from utils.helpers import async_retry, build_error_response, jina_limiter, se_limiter
 
@@ -56,10 +57,15 @@ def register_doc_tools(mcp: FastMCP) -> None:
                 result = await _fetch_via_jina(ctx, url)
 
             await cache.set(cache_key, result)
+            await session_store.update_web_fetch(
+                url=url,
+                char_count=len(result),
+            )
             return result
 
         except httpx.TimeoutException:
             return f" Request timed out after {config.request_timeout}s for URL: `{url}`"
+            
         except httpx.HTTPStatusError as exc:
             return f" HTTP {exc.response.status_code} fetching `{url}`: {exc.response.text[:300]}"
         except Exception as exc:
@@ -97,8 +103,12 @@ def register_doc_tools(mcp: FastMCP) -> None:
         try:
             async with ContextManager() as ctx:
                 result = await _query_stack_exchange(ctx, query, num_results)
-
+   
             await cache.set(cache_key, result)
+            await session_store.update_so_search(
+                query=query,
+                result_count=num_results,
+            )
             return result
 
         except httpx.TimeoutException:

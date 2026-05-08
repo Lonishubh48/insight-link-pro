@@ -17,7 +17,7 @@ import sys
 from fastmcp import FastMCP
 
 from core.config import config
-from tools import register_analysis_tools, register_doc_tools, register_repo_tools
+from tools import register_analysis_tools, register_doc_tools, register_repo_tools, register_session_tools
 from utils.helpers import setup_logging
 
 # ------------------------------------------------------------------ #
@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 
 # Total tools: map_repository, inspect_code, web_to_markdown,
 #              search_stack_overflow, analyze_issues, dependency_checker
-_TOOL_COUNT = 6
+#              get_session_context, clear_session
+_TOOL_COUNT = 8
 
 
 def create_server() -> FastMCP:
@@ -57,6 +58,7 @@ def create_server() -> FastMCP:
     register_repo_tools(mcp)
     register_doc_tools(mcp)
     register_analysis_tools(mcp)
+    register_session_tools(mcp)
 
     logger.info(
         " Insight-Link Pro server '%s' initialised with %d tools.",

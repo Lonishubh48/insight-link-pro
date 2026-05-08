@@ -83,6 +83,36 @@ Answer: "Line 34 in users.py — your UserCreate model requires `email` as a
 
 ---
 
+## Session Memory
+
+Insight-Link Pro maintains a working memory across tool calls within a session.
+This eliminates redundant re-scanning and allows context-aware follow-up answers.
+
+| Tool | What It Records |
+|------|----------------|
+| `map_repository` | Active repo path and file tree |
+| `inspect_code` | File path, line range, total line count |
+| `web_to_markdown` | URL and content size |
+| `search_stack_overflow` | Query and result count |
+
+### Session Tools
+
+- `get_session_context` — retrieve full session summary including repo, files read, URLs fetched, searches run, and action timeline
+- `clear_session` — reset session memory without restarting the server
+
+### Example
+
+```
+User: "Map my repository"
+Claude: calls map_repository() — session records the repo
+
+User: "Now explain the config file"
+Claude: calls get_session_context() — recalls the repo path
+        calls inspect_code() on config.py directly
+        No re-scanning needed
+```
+
+
 ## Setup
 
 ### 1. Clone & Install

@@ -22,6 +22,7 @@ from fastmcp import FastMCP
 
 from core.config import config
 from core.context_manager import cache
+from core.session_store import session_store
 from utils.helpers import build_error_response, format_file_tree
 
 logger = logging.getLogger(__name__)
@@ -113,9 +114,13 @@ def register_repo_tools(mcp: FastMCP) -> None:
                 format_file_tree(tree_data),
                 f"\nLocation: {root}"
             ]
-            
+
             rendered = "\n".join(output)
             await cache.set(cache_key, rendered)
+            await session_store.update_repo_scan(
+                repo_path=str(root),
+                tree_summary=rendered,
+            )
             return rendered
 
         except PermissionError as exc:
@@ -184,6 +189,12 @@ def register_repo_tools(mcp: FastMCP) -> None:
             if limit_reached:
                 footer = f"\n\nNOTE: Output truncated to {max_window} lines per configuration."
 
+            await session_store.update_file_inspection(
+                file_path=str(path),
+                start_line=start_line,
+                end_line=start_line + len(snippet_lines) - 1,
+                line_count=total,
+            )
             return header + body + footer
 
         except UnicodeDecodeError as exc:
