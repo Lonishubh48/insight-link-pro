@@ -9,7 +9,7 @@ build-backend = "setuptools.backends.legacy:build"
 # ------------------------------------------------------------
 [project]
 name = "insight-link-pro"
-version = "0.2.0"
+version = "0.3.0"
 description = "An MCP server that eliminates LLM hallucinations by grounding answers in live repository context and real-time documentation."
 readme = "README.md"
 license = { text = "MIT" }
