@@ -13,7 +13,7 @@ Usage:
 import argparse
 import logging
 import sys
-from fastapi.responses import JSONResponse
+# from fastapi.responses import JSONResponse
 import json
 import os
 
@@ -33,8 +33,8 @@ logger = logging.getLogger(__name__)
 
 # Total tools: map_repository, inspect_code, web_to_markdown,
 #              search_stack_overflow, analyze_issues, dependency_checker
-#              get_session_context, clear_session
-_TOOL_COUNT = 8
+#              get_session_context, clear_session, map_github_repo
+_TOOL_COUNT = 9
 
 
 def create_server() -> FastMCP:
@@ -57,11 +57,13 @@ def create_server() -> FastMCP:
             "Always cite the file path or URL you used. Never guess — fetch first, then answer."
         ),
     )
-    @mcp.external_app.get("/.well-known/mcp/server-card.json")
-    async def get_server_card():
+
+    @mcp.custom_route("/.well-known/mcp/server-card.json", methods=["GET"])
+    async def get_server_card(request):
         """
-        Serves the SEP-1649 discovery card for Smithery.ai and other registries.
+        Serves the discovery card for Smithery.ai and other registries.
         """
+        from starlette.responses import JSONResponse
         try:
             card_path = os.path.join(BASE_DIR, ".well-known", "mcp", "server-card.json")
             with open(card_path, "r") as f:
@@ -69,7 +71,7 @@ def create_server() -> FastMCP:
             return JSONResponse(content=card_data)
         except FileNotFoundError:
             return JSONResponse(
-                status_code=404, 
+                status_code=404,
                 content={"error": "server-card.json not found"}
             )
          
