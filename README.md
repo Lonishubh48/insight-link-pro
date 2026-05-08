@@ -20,7 +20,7 @@ Insight-Link Pro solves this with a **3-stage execution pipeline**:
 
 ## 🎬 Demo Video
 
-https://github.com/yourname/insight-link-pro/assets/demo_clip.mp4
+https://github.com/Lonishubh48/insight-link-pro/assets/demo_clip.mp4
 
 *Full walkthrough using the `huggingface/transformers` repository — covering all 6 tools in a single session.*
 
@@ -118,7 +118,7 @@ Claude: calls get_session_context() — recalls the repo path
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/yourname/insight-link-pro
+git clone https://github.com/Lonishubh48/insight-link-pro
 cd insight-link-pro
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
