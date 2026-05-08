@@ -13,6 +13,9 @@ Usage:
 import argparse
 import logging
 import sys
+from fastapi.responses import JSONResponse
+import json
+import os
 
 from fastmcp import FastMCP
 
@@ -23,6 +26,7 @@ from utils.helpers import setup_logging
 # ------------------------------------------------------------------ #
 # Bootstrap
 # ------------------------------------------------------------------ #
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -53,7 +57,22 @@ def create_server() -> FastMCP:
             "Always cite the file path or URL you used. Never guess — fetch first, then answer."
         ),
     )
-
+    @mcp.external_app.get("/.well-known/mcp/server-card.json")
+    async def get_server_card():
+        """
+        Serves the SEP-1649 discovery card for Smithery.ai and other registries.
+        """
+        try:
+            card_path = os.path.join(BASE_DIR, ".well-known", "mcp", "server-card.json")
+            with open(card_path, "r") as f:
+                card_data = json.load(f)
+            return JSONResponse(content=card_data)
+        except FileNotFoundError:
+            return JSONResponse(
+                status_code=404, 
+                content={"error": "server-card.json not found"}
+            )
+         
     # Register all tool groups
     register_repo_tools(mcp)
     register_doc_tools(mcp)
@@ -61,7 +80,7 @@ def create_server() -> FastMCP:
     register_session_tools(mcp)
 
     logger.info(
-        " Insight-Link Pro server '%s' initialised with %d tools.",
+        "Insight-Link Pro server '%s' initialised with %d tools.",
         config.server_name,
         _TOOL_COUNT,
     )
@@ -101,6 +120,7 @@ def parse_args() -> argparse.Namespace:
         help="SSE port (default: 8000)",
     )
     return parser.parse_args()
+
 
 
 def main() -> None:

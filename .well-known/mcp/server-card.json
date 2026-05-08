@@ -1,0 +1,81 @@
+{
+  "name": "Insight-Link Pro",
+  "version": "0.2.0",
+  "description": "An MCP server that eliminates LLM hallucinations by grounding answers in live repository context and real-time documentation.",
+  "author": {
+    "name": "Shubham Loni",
+    "url": "https://github.com/Lonishubh48"
+  },
+  "homepage": "https://github.com/Lonishubh48/insight-link-pro",
+  "license": "MIT",
+  "categories": ["developer-tools", "code-analysis", "documentation"],
+  "keywords": ["mcp", "llm", "hallucination", "claude", "fastmcp", "python", "repository", "code-analysis"],
+  "tools": [
+    {
+      "name": "map_repository",
+      "description": "Walk a local repository and return a filtered ASCII file tree. Respects .mcpignore for custom exclusions.",
+      "inputs": [
+        { "name": "root_path", "type": "string", "required": true, "description": "Absolute or relative path to the repository root." }
+      ]
+    },
+    {
+      "name": "inspect_code",
+      "description": "Read a specific line range from a source file with line numbers and syntax highlighting.",
+      "inputs": [
+        { "name": "file_path", "type": "string", "required": true, "description": "Path to the file." },
+        { "name": "start_line", "type": "integer", "required": false, "description": "First line to read (default 1)." },
+        { "name": "end_line", "type": "integer", "required": false, "description": "Last line to read (default EOF)." }
+      ]
+    },
+    {
+      "name": "web_to_markdown",
+      "description": "Fetch any URL and convert it to clean Markdown using Jina AI reader.",
+      "inputs": [
+        { "name": "url", "type": "string", "required": true, "description": "Fully-qualified URL to fetch." }
+      ]
+    },
+    {
+      "name": "search_stack_overflow",
+      "description": "Search Stack Overflow and return summarized top answers for a query.",
+      "inputs": [
+        { "name": "query", "type": "string", "required": true, "description": "Search query string." },
+        { "name": "num_results", "type": "integer", "required": false, "description": "Number of results to fetch (1-10, default 5)." }
+      ]
+    },
+    {
+      "name": "analyze_issues",
+      "description": "Fetch and categorise open GitHub issues into bugs, features, good first issues, security, and docs.",
+      "inputs": [
+        { "name": "github_repo", "type": "string", "required": true, "description": "Repository in owner/repo format." },
+        { "name": "max_issues", "type": "integer", "required": false, "description": "Maximum issues to analyse (1-100, default 50)." }
+      ]
+    },
+    {
+      "name": "dependency_checker",
+      "description": "Check requirements.txt or package.json for outdated and CVE-vulnerable packages via PyPI, npm, and OSV.dev.",
+      "inputs": [
+        { "name": "manifest_path", "type": "string", "required": true, "description": "Path to requirements.txt or package.json." }
+      ]
+    },
+    {
+      "name": "get_session_context",
+      "description": "Retrieve full session memory including scanned repos, inspected files, fetched URLs, searches run, and action timeline.",
+      "inputs": [
+        { "name": "session_id", "type": "string", "required": false, "description": "Session identifier (default: default)." }
+      ]
+    },
+    {
+      "name": "clear_session",
+      "description": "Reset session memory without restarting the server.",
+      "inputs": [
+        { "name": "session_id", "type": "string", "required": false, "description": "Session identifier to clear (default: default)." }
+      ]
+    }
+  ],
+  "installation": {
+    "type": "stdio",
+    "command": "python",
+    "args": ["main.py"],
+    "requirements": "requirements.txt"
+  }
+}
