@@ -82,7 +82,44 @@ Answer: "Line 34 in users.py — your UserCreate model requires `email` as a
 | `dependency_checker` | Outdated + CVE-vulnerable packages via PyPI/npm/OSV |
 | `get_session_context` | Recall everything done in the current session |
 | `clear_session` | Reset session memory without restarting the server |
+| `map_github_repo` | Map any public GitHub repo without cloning — use `owner/repo` format |
 
+### Using `map_github_repo`
+
+The `github_repo` argument must be provided in the following format:
+
+```txt
+owner/repo
+```
+
+#### ✅ Correct
+
+```txt
+milesial/pytorch-unet
+```
+
+#### ❌ Incorrect
+
+```txt
+https://github.com/milesial/pytorch-unet
+```
+
+`map_github_repo` expects only the GitHub repository identifier, not the full GitHub URL.
+
+If an invalid format is provided, the tool will return:
+
+```txt
+ERROR: Invalid repo format. Use owner/repo (e.g. fastapi/fastapi).
+```
+
+#### Additional Examples
+
+```txt
+openai/openai-python
+fastapi/fastapi
+langchain-ai/langchain
+microsoft/TypeScript
+```
 ---
 
 ## Session Memory

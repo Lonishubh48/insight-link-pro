@@ -28,7 +28,8 @@ def setup_logging() -> None:
     level = getattr(logging, config.log_level.upper(), logging.INFO)
     fmt = "%(asctime)s  %(levelname)-8s  %(name)s  %(message)s"
     datefmt = "%Y-%m-%dT%H:%M:%S"
-    logging.basicConfig(stream=sys.stdout, level=level, format=fmt, datefmt=datefmt)
+    # logging.basicConfig(stream=sys.stdout, level=level, format=fmt, datefmt=datefmt)
+    logging.basicConfig(stream=sys.stderr, level=level, format=fmt, datefmt=datefmt)
     # Quiet noisy third-party loggers
     for noisy in ("httpx", "httpcore", "hpack"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
