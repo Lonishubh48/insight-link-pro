@@ -1,0 +1,144 @@
+[build-system]
+requires = ["setuptools>=72.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+# ------------------------------------------------------------
+# Project metadata
+# This is what appears on PyPI if you ever publish the package.
+# It also tells tools like pip, uv, and IDEs about your project.
+# ------------------------------------------------------------
+[project]
+name = "insight-link-pro"
+version = "0.2.0"
+description = "An MCP server that eliminates LLM hallucinations by grounding answers in live repository context and real-time documentation."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [
+    { name = "Shubham Loni", email = "shubhamloni@gmail.com" }
+]
+keywords = [
+    "mcp",
+    "llm",
+    "hallucination",
+    "fastmcp",
+    "claude",
+    "ai",
+    "developer-tools",
+    "repository-analysis",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Runtime dependencies — mirrors requirements.txt
+dependencies = [
+    "fastmcp>=2.0.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+]
+
+# Optional dependencies — installed with: pip install insight-link-pro[dev]
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "mypy>=1.10.0",
+    "ruff>=0.4.0",
+]
+
+# Entry point — allows running the server with: insight-link-pro
+[project.scripts]
+insight-link-pro = "main:main"
+
+[project.urls]
+Homepage = "https://github.com/Lonishubh48/insight-link-pro"
+Repository = "https://github.com/Lonishubh48/insight-link-pro"
+"Bug Tracker" = "https://github.com/Lonishubh48/insight-link-pro/issues"
+
+# ------------------------------------------------------------
+# Setuptools configuration
+# Tells setuptools which packages to include in the build.
+# ------------------------------------------------------------
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "tools*", "utils*"]
+
+# ------------------------------------------------------------
+# Ruff — fast Python linter and formatter
+# Replaces flake8, isort, and parts of pylint in one tool.
+# Run with: ruff check . and ruff format .
+# ------------------------------------------------------------
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (unused imports, undefined names)
+    "I",   # isort (import ordering)
+    "B",   # flake8-bugbear (common bugs)
+    "UP",  # pyupgrade (modern Python syntax)
+    "N",   # pep8-naming conventions
+]
+ignore = [
+    "E501",  # line too long — handled by formatter
+    "B008",  # do not perform function calls in default arguments
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Allow unused imports in __init__.py files (they re-export symbols)
+"__init__.py" = ["F401"]
+
+# ------------------------------------------------------------
+# Mypy — static type checker
+# Run with: mypy .
+# ------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+# Exclude virtual environment from type checking
+exclude = ["venv/", ".venv/"]
+
+# ------------------------------------------------------------
+# Pytest — test runner configuration
+# Run with: pytest
+# Run with coverage: pytest --cov=. --cov-report=term-missing
+# ------------------------------------------------------------
+[tool.pytest.ini_options]
+asyncio_mode = "auto"         # automatically handle async test functions
+testpaths = ["tests"]         # look for tests in the tests/ directory
+python_files = ["test_*.py"]  # test file naming convention
+python_functions = ["test_*"] # test function naming convention
+log_cli = true                # show log output during test runs
+log_cli_level = "INFO"
+
+# ------------------------------------------------------------
+# Coverage.py — test coverage configuration
+# Run with: pytest --cov=. --cov-report=html
+# ------------------------------------------------------------
+[tool.coverage.run]
+source = ["core", "tools", "utils"]
+omit = [
+    "tests/*",
+    ".venv/*",
+    "venv/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 70               # fail the build if coverage drops below 70%
