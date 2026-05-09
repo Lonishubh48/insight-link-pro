@@ -22,7 +22,7 @@ Insight-Link Pro solves this with a **3-stage execution pipeline**:
 
 https://github.com/Lonishubh48/insight-link-pro/assets/demo.mp4
 
-*Full walkthrough using the `huggingface/transformers` repository — covering all 6 tools in a single session.*
+*Full walkthrough using the ` ultralytics/yolov5` repository — covering few imp. tools in a single session.*
 
 ---
 
