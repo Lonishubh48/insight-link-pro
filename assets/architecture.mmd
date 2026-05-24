@@ -1,0 +1,51 @@
+flowchart TD
+    User(["User Question"])
+    CD["Claude Desktop\nMCP Client"]
+
+    User --> CD
+
+    CD --> S1
+
+    subgraph S1["Stage 1 — Exploration"]
+        direction LR
+        MR["map_repository\nLocal file tree + .mcpignore"]
+        MGR["map_github_repo\nAny public GitHub repo"]
+    end
+
+    S1 --> S2
+
+    subgraph S2["Stage 2 — Ingestion"]
+        direction LR
+        IC["inspect_code\nRead file line ranges"]
+        WM["web_to_markdown\nFetch any URL via Jina AI"]
+        SO["search_stack_overflow\nVerified community answers"]
+        AI["analyze_issues\nGitHub issue categories"]
+    end
+
+    S2 --> S3
+
+    subgraph S3["Stage 3 — Synthesis"]
+        ANS["Grounded answer\nEvery claim cited and verified"]
+    end
+
+    S3 -.-> SM
+    S3 -.-> DC
+
+    subgraph SUPPORT["Supporting Tools"]
+        SM["Session memory\nget_session_context / clear_session"]
+        DC["dependency_checker\nPyPI + npm + OSV.dev CVE scan"]
+    end
+
+    classDef stage fill:#1D9E75,stroke:#0F6E56,color:#E1F5EE
+    classDef ingestion fill:#185FA5,stroke:#0C447C,color:#E6F1FB
+    classDef synthesis fill:#993C1D,stroke:#712B13,color:#FAECE7
+    classDef support fill:#BA7517,stroke:#854F0B,color:#FAEEDA
+    classDef client fill:#534AB7,stroke:#3C3489,color:#EEEDFE
+    classDef user fill:#5F5E5A,stroke:#444441,color:#F1EFE8
+
+    class MR,MGR stage
+    class IC,WM,SO,AI ingestion
+    class ANS synthesis
+    class SM,DC support
+    class CD client
+    class User user
