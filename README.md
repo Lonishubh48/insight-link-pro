@@ -236,6 +236,48 @@ insight_link_pro/
 ├── .env.example
 └── requirements.txt
 ```
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    User(["User Question"])
+    CD["Claude Desktop\nMCP Client"]
+
+    User --> CD
+    CD --> S1
+
+    subgraph S1["Stage 1 — Exploration"]
+        direction LR
+        MR["map_repository\nLocal file tree + .mcpignore"]
+        MGR["map_github_repo\nAny public GitHub repo"]
+    end
+
+    S1 --> S2
+
+    subgraph S2["Stage 2 — Ingestion"]
+        direction LR
+        IC["inspect_code\nRead file line ranges"]
+        WM["web_to_markdown\nFetch any URL via Jina AI"]
+        SO["search_stack_overflow\nVerified community answers"]
+        AI["analyze_issues\nGitHub issue categories"]
+    end
+
+    S2 --> S3
+
+    subgraph S3["Stage 3 — Synthesis"]
+        ANS["Grounded answer\nEvery claim cited and verified"]
+    end
+
+    S3 -.-> SM
+    S3 -.-> DC
+
+    subgraph SUPPORT["Supporting Tools"]
+        SM["Session memory\nget_session_context / clear_session"]
+        DC["dependency_checker\nPyPI + npm + OSV.dev CVE scan"]
+    end
+```
+
+
 
 ### Key Design Decisions
 
